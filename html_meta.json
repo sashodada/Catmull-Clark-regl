@@ -1,0 +1,5 @@
+{
+  "title": "Catmull-Clark subdivision",
+  "description": "Implementation of the Catmull-Clark subdivision algorithm using JavaScript and ReGL(a WebGL wrapper library)",
+  "author": "Aleksandar Shumakov"
+}
