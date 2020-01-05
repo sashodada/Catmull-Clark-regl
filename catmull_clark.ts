@@ -145,16 +145,30 @@ export function catmullClark(positions: number[][], cells: number[][]) {
   cells.forEach((cell, index) => {
     const facePoint = facePoints.get(index);
 
-    const newIndeces = cell.map(positionIndex => subdivManager.getIndex(newVertexPositions.get(positionIndex)));
+    const newIndices = cell.map(positionIndex => subdivManager.getIndex(newVertexPositions.get(positionIndex)));
     const facePointIndex = subdivManager.getIndex({ newPosition: facePoint, newIndex: null });
-    cell.forEach((positionIndex, cellPositionIndex) => {
-      const secondPosIndex = cell[(cellPositionIndex + 1) % cell.length];
-      const edge = [positionIndex, secondPosIndex];
-      const edgePoint = edgePoints.get(edgeKey(edge));
-      const edgePointIndex = subdivManager.getIndex({ newPosition: edgePoint, newIndex: null });
 
-      subdivManager.addCell([newIndeces[cellPositionIndex], edgePointIndex, facePointIndex]);
-      subdivManager.addCell([edgePointIndex, newIndeces[(cellPositionIndex + 1) % cell.length], facePointIndex]);
+    const newEdgeIndices = new Map<string, number>(
+      cell.map((positionIndex, cellPositionIndex) => {
+        const secondPosIndex = cell[(cellPositionIndex + 1) % cell.length];
+        const edge = [positionIndex, secondPosIndex];
+        const key = edgeKey(edge);
+        const edgePoint = edgePoints.get(edgeKey(edge));
+        const edgePointIndex = subdivManager.getIndex({ newPosition: edgePoint, newIndex: null });
+        return [key, edgePointIndex];
+      })
+    );
+
+    cell.forEach((positionIndex, cellPositionIndex) => {
+      const nextPositionIndex = cell[(cellPositionIndex + 1) % cell.length];
+      const nextEdge = [positionIndex, nextPositionIndex];
+      const nextEdgePos = newEdgeIndices.get(edgeKey(nextEdge));
+
+      const prevPositionIndex = cell[(cellPositionIndex + cell.length - 1) % cell.length];
+      const prevEdge = [positionIndex, prevPositionIndex];
+      const prevEdgePos = newEdgeIndices.get(edgeKey(prevEdge));
+
+      subdivManager.addCell([prevEdgePos, newIndices[cellPositionIndex], nextEdgePos, facePointIndex]);
     })
   })
 

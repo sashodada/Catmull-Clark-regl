@@ -17,14 +17,22 @@ function initUI() {
   const polyCounter = document.createElement('p');
   polyCounter.textContent = `${handler.polygonCount} triangles`;
 
+  const wireframeButton = document.createElement('button');
+  wireframeButton.disabled = true;
+  wireframeButton.textContent = 'Toggle wireframe mode';
+  wireframeButton.onclick = () => {
+    handler.handleToggleWireframe();
+  }
+
   const subdivideButton = document.createElement('button');
   subdivideButton.textContent = 'Subdivide';
   subdivideButton.onclick = () => {
-    if (handler.subdivisionCounter > 4) {
+    if (handler.subdivisionCounter > 10) {
       alert('Too much polygons, cannot render properly!');
       return;
     }
     handler.handleUpshift();
+    wireframeButton.disabled = false;
     subdivisionCounter.textContent = `Subdivisions: ${handler.subdivisionCounter}`;
     polyCounter.textContent = `${handler.polygonCount} triangles`;
   }
@@ -33,18 +41,16 @@ function initUI() {
   resetButton.textContent = 'Reset';
   resetButton.onclick = () => {
     handler.handleReset();
+    wireframeButton.disabled = true;
     subdivisionCounter.textContent = `Subdivision restarted`;
     polyCounter.textContent = `${handler.polygonCount} triangles`;
   }
 
-  const breakLine = document.createElement('br');
-
   menuContainer.appendChild(resetButton);
   menuContainer.appendChild(subdivideButton);
-  menuContainer.append(breakLine);
   menuContainer.append(subdivisionCounter);
-  menuContainer.append(breakLine);
   menuContainer.append(polyCounter);
+  menuContainer.append(wireframeButton);
 }
 
 window.onload = initUI;
