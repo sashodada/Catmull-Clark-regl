@@ -4,7 +4,8 @@ import { SubdivisionManager } from './subdivision_manager';
 
 interface VertexData {
   facePoints: number[][],
-  edgeMidPoints: number[][],
+  edgeMidPoints: Map<string, number[]>,
+
 }
 
 function findFacePoint(facePositions: number[], positions: number[][]) {
@@ -44,16 +45,6 @@ function getEdgePoints(facePoints: number[][], endpoints: number[][]) {
   return avg;
 }
 
-function defineFacePointEdges(facePositions: number[], facePoint: number[], positions: number[][], edgePoints: Map<string, number[]>) {
-  let avg = vec3.fromValues(0, 0, 0);
-  const newEdges = [];
-  facePositions.forEach((posIndex, index) => {
-    const edge = [posIndex, facePositions[(index + 1) % facePositions.length]];
-    newEdges.push([facePoint, edgePoints.get(edgeKey(edge))]);
-  });
-  return newEdges;
-}
-
 function getEdgeMidPoint(edge: number[], positions: number[][]) {
   let avg = vec3.fromValues(0, 0, 0);
   edge.forEach(i => vec3.add(avg, avg, positions[i]));
@@ -69,20 +60,20 @@ function fillVertexData(facePositions: number[], facePoint: number[], positions:
       let vertex: VertexData;
       if (!vertexData.has(vertIndex)) {
         vertex = {
-          edgeMidPoints: [],
+          edgeMidPoints: new Map<string, number[]>(),
           facePoints: [],
         };
       } else {
         vertex = vertexData.get(vertIndex)
       }
-      vertex.edgeMidPoints.push(edgeMidPoint);
+      vertex.edgeMidPoints.set(edgeMidPoint.toString(), edgeMidPoint);
       vertexData.set(vertIndex, vertex);
     });
 
     let vertex: VertexData;
     if (!vertexData.has(posIndex)) {
       vertex = {
-        edgeMidPoints: [],
+        edgeMidPoints: new Map<string, number[]>(),
         facePoints: [],
       };
     } else {
@@ -112,19 +103,20 @@ function getVertexPoint(posIndex: number, positions: number[][], vertexData: Ver
   const fpAverage = getAverage(vertexData.facePoints);
   vec3.add(avg, avg, fpAverage);
 
-  const empAverage = getAverage(vertexData.edgeMidPoints);
+  const empAverage = getAverage(Array.from(vertexData.edgeMidPoints.values()));
   const empScaled = vec3.fromValues(0, 0, 0);
   vec3.scale(empScaled, empAverage, 2.0);
   vec3.add(avg, avg, empScaled);
 
-  vec3.add(avg, avg, positions[posIndex]);
+  const [x, y, z] = positions[posIndex];
+  const scaledPoint = vec3.fromValues(x, y, z);
+  
+  vec3.scale(scaledPoint, scaledPoint, n - 3);
+
+  vec3.add(avg, avg, scaledPoint);
   vec3.scale(avg, avg, 1.0 / n);
 
   return avg;
-}
-
-function createVerticesAndCells() {
-
 }
 
 export function catmullClark(positions: number[][], cells: number[][]) {
@@ -142,9 +134,9 @@ export function catmullClark(positions: number[][], cells: number[][]) {
   const vertexData = new Map<number, VertexData>();
   cells.forEach((cell, index) => fillVertexData(cell, facePoints.get(index), positions, vertexData));
 
-  const newVertexPositions = new Map<number, number[]>(
+  const newVertexPositions = new Map<number, { newPosition: number[], newIndex: number }>(
     Array.from(vertexData.entries()).map(
-      ([posIndex, vertData]) => [posIndex, getVertexPoint(posIndex, positions, vertData)]
+      ([posIndex, vertData]) => [posIndex, { newPosition: getVertexPoint(posIndex, positions, vertData), newIndex: null }]
     )
   );
 
@@ -154,12 +146,12 @@ export function catmullClark(positions: number[][], cells: number[][]) {
     const facePoint = facePoints.get(index);
 
     const newIndeces = cell.map(positionIndex => subdivManager.getIndex(newVertexPositions.get(positionIndex)));
-    const facePointIndex = subdivManager.getIndex(facePoint);
+    const facePointIndex = subdivManager.getIndex({ newPosition: facePoint, newIndex: null });
     cell.forEach((positionIndex, cellPositionIndex) => {
       const secondPosIndex = cell[(cellPositionIndex + 1) % cell.length];
       const edge = [positionIndex, secondPosIndex];
       const edgePoint = edgePoints.get(edgeKey(edge));
-      const edgePointIndex = subdivManager.getIndex(edgePoint);
+      const edgePointIndex = subdivManager.getIndex({ newPosition: edgePoint, newIndex: null });
 
       subdivManager.addCell([newIndeces[cellPositionIndex], edgePointIndex, facePointIndex]);
       subdivManager.addCell([edgePointIndex, newIndeces[(cellPositionIndex + 1) % cell.length], facePointIndex]);

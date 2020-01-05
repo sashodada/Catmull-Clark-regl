@@ -1,40 +1,50 @@
-import * as REGL from 'regl';
-import * as reglCamera from 'regl-camera';
-import * as calculateNormals from 'angle-normals';
-import { catmullClark } from './catmull_clark';
-import { initUserInterface } from './ui';
 import { cube } from './cube';
-import { vertexShaderCode, fragmentShaderCode } from './shader_code';
-import { pyramid } from './pyramid';
+import { CallHandler } from './callHandler';
 
-const regl = REGL();
-const camera = reglCamera(regl, {
-    center: [0, 0, 0],
-    distance: 10,
-});
+const handler = new CallHandler(cube.positions, cube.cells);
 
-// let obj = cube;
-let obj = pyramid;
-// obj = catmullClark(obj.positions, obj.cells)
-const { positions, cells } = obj;
+function initUI() {
 
-const normals = calculateNormals(cells, positions);
+  const body = document.querySelector('body');
 
-const draw = regl({
-  vert: vertexShaderCode,
-  frag: fragmentShaderCode,
+  const menuContainer = document.createElement('div');
+  menuContainer.style.position = 'absolute';
+  body.appendChild(menuContainer);
 
-  attributes: {
-    position: positions,
-    normal: normals,
-  },
+  const subdivisionCounter = document.createElement('p');
+  subdivisionCounter.textContent = `No subdivisions`;
 
-  elements: cells,
-});
+  const polyCounter = document.createElement('p');
+  polyCounter.textContent = `${handler.polygonCount} triangles`;
 
-regl.frame(() => {
-  regl.clear({ color: [1, 0.7, 0.7, 1] });
-  camera(draw);
-});
+  const subdivideButton = document.createElement('button');
+  subdivideButton.textContent = 'Subdivide';
+  subdivideButton.onclick = () => {
+    if (handler.subdivisionCounter > 4) {
+      alert('Too much polygons, cannot render properly!');
+      return;
+    }
+    handler.handleUpshift();
+    subdivisionCounter.textContent = `Subdivisions: ${handler.subdivisionCounter}`;
+    polyCounter.textContent = `${handler.polygonCount} triangles`;
+  }
 
- initUserInterface();
+  const resetButton = document.createElement('button');
+  resetButton.textContent = 'Reset';
+  resetButton.onclick = () => {
+    handler.handleReset();
+    subdivisionCounter.textContent = `Subdivision restarted`;
+    polyCounter.textContent = `${handler.polygonCount} triangles`;
+  }
+
+  const breakLine = document.createElement('br');
+
+  menuContainer.appendChild(resetButton);
+  menuContainer.appendChild(subdivideButton);
+  menuContainer.append(breakLine);
+  menuContainer.append(subdivisionCounter);
+  menuContainer.append(breakLine);
+  menuContainer.append(polyCounter);
+}
+
+window.onload = initUI;

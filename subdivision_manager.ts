@@ -11,15 +11,20 @@ export class SubdivisionManager {
     return vertex.toString();
   }
 
-  getIndex(vertex: number[]) {
-    const key = this.getKey(vertex);
-    const index = this.indices.get(key)
+  getIndex(vertexData: {newPosition: number[], newIndex: number}) {
+    const { newIndex, newPosition } = vertexData;
+    if (newIndex !== null) {
+      return newIndex;
+    }
+    const key = this.getKey(newPosition);
+    const index = this.indices.get(key);
     if (index) {
       return index;
     }
-    
+
     this.indices.set(key, this.vertexCounter);
-    this.vertices[this.vertexCounter] = vertex;
+    this.vertices[this.vertexCounter] = newPosition;
+    vertexData.newIndex = this.vertexCounter;
     return this.vertexCounter++;
   }
 
