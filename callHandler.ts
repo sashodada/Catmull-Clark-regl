@@ -18,6 +18,7 @@ export class CallHandler {
 
   private obj: { positions: number[][], cells: number[][] };
   polygonCount: number;
+  vertexCount: number;
   
   constructor(private positions: number[][], private cells: number[][]) {
     this.regl = REGL();
@@ -62,6 +63,7 @@ export class CallHandler {
     }
 
     this.polygonCount = cells.length;
+    this.vertexCount = positions.length;
 
     const normals = calculateNormals(cells, positions);
     this.draw = this.regl({
@@ -71,11 +73,6 @@ export class CallHandler {
       attributes: {
         position: positions,
         normal: normals,
-      },
-
-      cull: {
-        enable: true,
-        face: 'back',
       },
 
       primitive: this.wireframe ? 'lines' : 'triangles',

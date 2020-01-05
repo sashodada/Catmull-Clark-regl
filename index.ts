@@ -1,7 +1,10 @@
 import { cube } from './cube';
+import bunny = require('bunny');
+import teapot = require('teapot');
 import { CallHandler } from './callHandler';
 
 const handler = new CallHandler(cube.positions, cube.cells);
+// const handler = new CallHandler(teapot.positions, teapot.cells);
 
 function initUI() {
 
@@ -17,6 +20,9 @@ function initUI() {
   const polyCounter = document.createElement('p');
   polyCounter.textContent = `${handler.polygonCount} triangles`;
 
+  const vertCounter = document.createElement('p');
+  vertCounter.textContent = `${handler.vertexCount} vertices`;
+
   const wireframeButton = document.createElement('button');
   wireframeButton.disabled = true;
   wireframeButton.textContent = 'Toggle wireframe mode';
@@ -27,7 +33,7 @@ function initUI() {
   const subdivideButton = document.createElement('button');
   subdivideButton.textContent = 'Subdivide';
   subdivideButton.onclick = () => {
-    if (handler.subdivisionCounter > 10) {
+    if (handler.subdivisionCounter > 5) {
       alert('Too much polygons, cannot render properly!');
       return;
     }
@@ -35,6 +41,7 @@ function initUI() {
     wireframeButton.disabled = false;
     subdivisionCounter.textContent = `Subdivisions: ${handler.subdivisionCounter}`;
     polyCounter.textContent = `${handler.polygonCount} triangles`;
+    vertCounter.textContent = `${handler.vertexCount} vertices`;
   }
 
   const resetButton = document.createElement('button');
@@ -44,12 +51,14 @@ function initUI() {
     wireframeButton.disabled = true;
     subdivisionCounter.textContent = `Subdivision restarted`;
     polyCounter.textContent = `${handler.polygonCount} triangles`;
+    vertCounter.textContent = `${handler.vertexCount} vertices`;
   }
 
   menuContainer.appendChild(resetButton);
   menuContainer.appendChild(subdivideButton);
   menuContainer.append(subdivisionCounter);
   menuContainer.append(polyCounter);
+  menuContainer.append(vertCounter);
   menuContainer.append(wireframeButton);
 }
 
