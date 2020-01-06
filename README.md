@@ -14,4 +14,4 @@ Before running the project, one must first install all dependencies using `npm i
 - Build static artefact: run `npm run clear && npm run compile` to build a static `index.html` file.
 
 ### Demo
-A demo of the latest build can be found at [this link](https://sashodada.github.io/Catmull-Clark-regl/)
+A demo of the latest build can be found at [this link](https://sashodada.github.io/Catmull-Clark-regl/).
