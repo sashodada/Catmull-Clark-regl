@@ -5,7 +5,6 @@ import { flatMap } from 'lodash'
 import { polisToTris } from './util';
 import { vertexShaderCode, fragmentShaderCode } from './shader_code';
 import calculateNormals = require('angle-normals');
-import { addSyntheticLeadingComment } from 'typescript';
 
 export class CallHandler {
 
@@ -51,6 +50,18 @@ export class CallHandler {
     this.drawFunc.cancel();
     this.wireframe = false;
     this.obj = { positions: this.positions, cells: this.cells };
+    this.subdivisionCounter = 0;
+
+    this.initRegl(this.positions, this.cells);
+  }
+
+  hotswapModel(newModel: { positions: number[][], cells: number[][]}) {
+    this.drawFunc.cancel();
+    this.obj = newModel;
+    this.positions = newModel.positions;
+    this.cells = newModel.cells;
+    this.wireframe = false;
+
     this.subdivisionCounter = 0;
 
     this.initRegl(this.positions, this.cells);

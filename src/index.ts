@@ -1,10 +1,8 @@
 import { cube } from './cube';
-import bunny = require('bunny');
-import teapot = require('teapot');
 import { CallHandler } from './callHandler';
-
+import { files } from './files';
+import { models } from './ts_models/models';
 const handler = new CallHandler(cube.positions, cube.cells);
-// const handler = new CallHandler(teapot.positions, teapot.cells);
 
 function initUI() {
 
@@ -28,6 +26,8 @@ function initUI() {
   wireframeButton.textContent = 'Toggle wireframe mode';
   wireframeButton.onclick = () => {
     handler.handleToggleWireframe();
+    polyCounter.textContent = `${handler.polygonCount} triangles`;
+    vertCounter.textContent = `${handler.vertexCount} vertices`;
   }
 
   const subdivideButton = document.createElement('button');
@@ -54,12 +54,31 @@ function initUI() {
     vertCounter.textContent = `${handler.vertexCount} vertices`;
   }
 
+  const figureSelect = document.createElement('select');
+  files.forEach(file => {
+    const opt = document.createElement('option');
+    opt.value = file;
+    opt.innerHTML = file;
+    figureSelect.appendChild(opt);
+  });
+
+  figureSelect.onchange = () => {
+    handler.hotswapModel(models[figureSelect.value]);
+    polyCounter.textContent = `${handler.polygonCount} triangles`;
+    vertCounter.textContent = `${handler.vertexCount} vertices`;
+    wireframeButton.disabled = true;
+    subdivisionCounter.textContent = `Figure swapped`;
+  };
+
+  const selectDiv = document.createElement('div');
+  selectDiv.append(figureSelect)
   menuContainer.appendChild(resetButton);
   menuContainer.appendChild(subdivideButton);
   menuContainer.append(subdivisionCounter);
   menuContainer.append(polyCounter);
   menuContainer.append(vertCounter);
   menuContainer.append(wireframeButton);
+  menuContainer.append(selectDiv);
 }
 
 window.onload = initUI;

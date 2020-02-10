@@ -15,7 +15,7 @@ export const fragmentShaderCode = `
   precision mediump float;
   varying vec3 vNormal;
   void main() {
-    vec3 lightDirection = -1.0 * vec3(1.0, 0.7, 0.5);
+    vec3 lightDirection = vec3(1.0, 0.7, 0.5);
     float brightness = max(0.0, dot(vNormal, lightDirection));
 
     vec3 ambient = vec3(0.05);
