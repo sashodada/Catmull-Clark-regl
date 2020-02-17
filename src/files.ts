@@ -12,6 +12,7 @@ export const files = [
   'dodecahedron',
   'dragon',
   'epcot',
+  'FILMAR_CORP',
   'goblet',
   'head',
   'heart',

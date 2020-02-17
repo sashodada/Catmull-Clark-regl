@@ -11,6 +11,7 @@ import { model as cuboctahedron } from './cuboctahedron';
 import { model as dodecahedron } from './dodecahedron';
 import { model as dragon } from './dragon';
 import { model as epcot } from './epcot';
+import { model as FILMAR_CORP } from './Foff';
 import { model as goblet } from './goblet';
 import { model as head } from './head';
 import { model as heart } from './heart';
@@ -62,6 +63,7 @@ export const models = {
   dodecahedron,
   dragon,
   epcot,
+  FILMAR_CORP,
   goblet,
   head,
   heart,
