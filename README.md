@@ -6,7 +6,7 @@ This is a university course project for the Computer-Aided Geometric Modeling (C
 
 ### Prerequisites
 - `npm`
-- browser supporting `WebGL` (mostly all contemporary browsers)
+- browser supporting `WebGL` (i.e. most all contemporary browsers)
 
 ### Installation
 Before running the project, one must first install all dependencies using `npm install` in the root directory of the project. From there on different uses require the following steps.
